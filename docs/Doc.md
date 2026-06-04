@@ -1,7 +1,7 @@
 # 1409 SDK — Документация
 
-SDK для использования дизайн-системы 1409 в Python-проектах.
-Позволяет подключать готовые UI-компоненты и экспортировать их в HTML и другие форматы.
+Python SDK для работы с дизайн-системой 1409.  
+Позволяет запрашивать UI-компоненты (лого, фон, кнопки и др.) с сервера `api.my1409.ru` и использовать их в любом Python-проекте.
 
 ---
 
@@ -26,17 +26,29 @@ pip install -e .
 ```
 1409-sdk-py/
 ├── 1409sdk/
-│   └── client.py       # Клиент для работы с компонентами
-├── design/             # Референсы UI-компонентов дизайн-системы 1409
-│   ├── button/
-│   ├── card/
-│   └── ...
-├── fonts/              # Шрифты дизайн-системы
+│   ├── client.py               # Основной клиент
+│   └── request_modal/
+│       └── api.py              # HTTP-запросы к api.my1409.ru
+├── fonts/                      # Шрифты дизайн-системы
 │   ├── Montserrat-Bold.ttf
 │   ├── Montserrat-Regular.ttf
 │   └── Roboto-Regular.ttf
 └── docs/
     └── Doc.md
+```
+
+---
+
+## Как это работает
+
+```
+Ваш код (Python / HTML)
+        ↓
+  Client.get("logo")
+        ↓
+  GET https://api.my1409.ru/design?component=logo
+        ↓
+  Сервер возвращает компонент (изображение, HTML и др.)
 ```
 
 ---
@@ -48,110 +60,85 @@ from 1409sdk.client import Client
 
 client = Client()
 
-# Посмотреть доступные компоненты
-components = client.list()
-print(components)
-# ['button', 'card', 'input', 'navbar', ...]
+# Получить лого
+logo = client.get("logo")          # bytes
 
-# Экспортировать компонент в папку проекта
-client.pull("button", dest="./my-project/components/")
+# Получить фон как строку HTML/CSS
+background = client.get_text("background")
 
-# Экспортировать сразу несколько компонентов
-client.pull_all(dest="./my-project/components/")
+# Скачать компонент в папку проекта
+client.pull("logo", dest="./assets/")
+# сохранит файл ./assets/logo
 ```
 
 ---
 
 ## Client
 
-### `Client(source=None)`
+### `Client()`
 
-Создаёт клиент для работы с дизайн-системой.
-
-| Параметр | Тип | По умолчанию | Описание |
-|----------|-----|--------------|----------|
-| `source` | `str` | Встроенная папка `design/` | Путь к папке с компонентами |
+Создаёт клиент для работы с `api.my1409.ru`. Авторизация не требуется.
 
 ```python
-# Использовать встроенные компоненты SDK
-client = Client()
+from 1409sdk.client import Client
 
-# Использовать собственную папку с компонентами
-client = Client(source="/path/to/custom/design/")
+client = Client()
+```
+
+---
+
+### `client.get(component) → bytes`
+
+Запрашивает компонент с сервера и возвращает его в байтах.
+
+| Параметр    | Тип   | Описание                                   |
+|-------------|-------|--------------------------------------------|
+| `component` | `str` | Название компонента: `'logo'`, `'background'`, `'button'` и т.д. |
+
+```python
+logo_bytes = client.get("logo")
+background_bytes = client.get("background")
+```
+
+---
+
+### `client.get_text(component) → str`
+
+Запрашивает компонент и возвращает его как строку (для HTML, CSS и подобных форматов).
+
+```python
+html = client.get_text("navbar")
+css = client.get_text("button")
+```
+
+---
+
+### `client.pull(component, dest) → str`
+
+Скачивает компонент и сохраняет файл в указанную папку.
+
+| Параметр    | Тип   | Описание             |
+|-------------|-------|----------------------|
+| `component` | `str` | Название компонента  |
+| `dest`      | `str` | Папка назначения     |
+
+```python
+client.pull("logo", dest="./assets/")
+# → ./assets/logo
+
+client.pull("background", dest="./static/img/")
+# → ./static/img/background
 ```
 
 ---
 
 ### `client.list() → list[str]`
 
-Возвращает список доступных компонентов.
+Возвращает список всех доступных компонентов с сервера.
 
 ```python
-client = Client()
 components = client.list()
-# ['button', 'card', 'input', 'modal', 'navbar']
-```
-
----
-
-### `client.info(name) → dict`
-
-Возвращает информацию о компоненте.
-
-| Параметр | Тип | Описание |
-|----------|-----|----------|
-| `name` | `str` | Название компонента |
-
-```python
-info = client.info("button")
-# {
-#   "name": "button",
-#   "files": ["button.html", "button.css"],
-#   "description": "Кнопка дизайн-системы 1409"
-# }
-```
-
----
-
-### `client.pull(name, dest, format="html") → str`
-
-Копирует файлы компонента в указанную папку проекта.
-
-| Параметр | Тип | По умолчанию | Описание |
-|----------|-----|--------------|----------|
-| `name` | `str` | — | Название компонента |
-| `dest` | `str` | — | Путь назначения |
-| `format` | `str` | `"html"` | Формат экспорта: `"html"`, `"css"`, `"all"` |
-
-```python
-# Скопировать HTML компонента
-client.pull("button", dest="./src/components/")
-
-# Скопировать только CSS
-client.pull("button", dest="./src/styles/", format="css")
-
-# Скопировать все файлы компонента
-client.pull("button", dest="./src/components/", format="all")
-```
-
-Возвращает путь к скопированному файлу.
-
----
-
-### `client.pull_all(dest, format="html") → list[str]`
-
-Копирует все компоненты дизайн-системы в указанную папку.
-
-| Параметр | Тип | По умолчанию | Описание |
-|----------|-----|--------------|----------|
-| `dest` | `str` | — | Путь назначения |
-| `format` | `str` | `"html"` | Формат экспорта |
-
-```python
-# Экспортировать все компоненты в проект
-paths = client.pull_all(dest="./src/components/")
-print(paths)
-# ['./src/components/button.html', './src/components/card.html', ...]
+# ['logo', 'background', 'button', 'card', ...]
 ```
 
 ---
@@ -161,93 +148,81 @@ print(paths)
 Копирует шрифты дизайн-системы в указанную папку.
 
 ```python
-client.fonts(dest="./src/fonts/")
-# ['./src/fonts/Montserrat-Bold.ttf', './src/fonts/Roboto-Regular.ttf', ...]
+client.fonts(dest="./static/fonts/")
+# ['./static/fonts/Montserrat-Bold.ttf', ...]
 ```
 
 ---
 
 ## Сценарии использования
 
-### Инициализация нового проекта
+### Скачать все нужные компоненты в проект
 
 ```python
 from 1409sdk.client import Client
 
 client = Client()
 
-# Скопировать все компоненты и шрифты в проект
-client.pull_all(dest="./my-app/components/")
-client.fonts(dest="./my-app/fonts/")
+client.pull("logo", dest="./assets/")
+client.pull("background", dest="./assets/")
+client.fonts(dest="./assets/fonts/")
 ```
 
-### Использование отдельного компонента
+### Использовать компонент напрямую в коде
 
 ```python
 from 1409sdk.client import Client
 
 client = Client()
-client.pull("card", dest="./templates/")
+
+# Получить HTML кнопки и вставить в шаблон
+button_html = client.get_text("button")
+
+page = f"""
+<html>
+  <body>
+    {button_html}
+  </body>
+</html>
+"""
 ```
 
-### Интеграция в Flask / Jinja2
+### Интеграция в Flask
 
 ```python
 from flask import Flask, render_template_string
 from 1409sdk.client import Client
-import os
 
 app = Flask(__name__)
 client = Client()
 
-# Экспортируем компоненты при запуске
-client.pull_all(dest="./templates/components/")
-
 @app.route("/")
 def index():
-    with open("./templates/components/card.html") as f:
-        card = f.read()
-    return render_template_string(card)
+    logo = client.get_text("logo")
+    return render_template_string(f"<html><body>{logo}</body></html>")
 ```
 
 ---
 
 ## Шрифты дизайн-системы
 
-SDK включает готовые шрифты:
-
-| Файл | Применение |
-|------|-----------|
-| `Montserrat-Bold.ttf` | Заголовки |
-| `Montserrat-Regular.ttf` | Подзаголовки |
-| `Roboto-Regular.ttf` | Основной текст |
-| `DejaVuSans.ttf` | Запасной шрифт (поддержка Unicode) |
+| Файл                    | Применение         |
+|-------------------------|--------------------|
+| `Montserrat-Bold.ttf`   | Заголовки          |
+| `Montserrat-Regular.ttf`| Подзаголовки       |
+| `Roboto-Regular.ttf`    | Основной текст     |
+| `DejaVuSans.ttf`        | Запасной (Unicode) |
 
 ---
 
-## Добавление собственных компонентов в `design/`
+## API
 
-Каждый компонент — папка с файлами:
+SDK обращается к `https://api.my1409.ru`.
 
-```
-design/
-└── my-component/
-    ├── my-component.html   # Разметка компонента
-    ├── my-component.css    # Стили
-    └── meta.json           # Описание (опционально)
-```
-
-Пример `meta.json`:
-
-```json
-{
-  "name": "my-component",
-  "description": "Мой компонент",
-  "version": "1.0.0"
-}
-```
-
-После этого компонент станет доступен через `client.list()` и `client.pull()`.
+| Метод | Путь              | Параметр            | Описание                         |
+|-------|-------------------|---------------------|----------------------------------|
+| GET   | `/design`         | `component=<name>`  | Возвращает компонент             |
+| GET   | `/design/list`    | —                   | Список доступных компонентов     |
 
 ---
 

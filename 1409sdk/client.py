@@ -1,95 +1,49 @@
 import os
 import shutil
-import json
-
+from .request_modal.api import get, get_text, get_list, link_tag
 
 _SDK_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-_DEFAULT_DESIGN = os.path.join(_SDK_ROOT, "design")
 _DEFAULT_FONTS = os.path.join(_SDK_ROOT, "fonts")
 
 
 class Client:
     """Клиент дизайн-системы 1409.
 
-    Позволяет получать список доступных UI-компонентов и экспортировать
-    их файлы (HTML, CSS и др.) в любую папку проекта.
-
-    Args:
-        source: Путь к папке с компонентами. По умолчанию — встроенная
-                папка design/ из SDK.
+    Все запросы выполняются через request_modal/api.py.
     """
 
-    def __init__(self, source: str = None):
-        self._source = source or _DEFAULT_DESIGN
+    def get(self, component: str) -> bytes:
+        """Возвращает компонент в байтах."""
+        return get(component)
 
-    def list(self) -> list[str]:
-        """Возвращает список доступных компонентов."""
-        if not os.path.isdir(self._source):
-            return []
-        return [
-            name for name in sorted(os.listdir(self._source))
-            if os.path.isdir(os.path.join(self._source, name))
-        ]
+    def get_text(self, component: str) -> str:
+        """Возвращает компонент как строку (HTML, CSS и др.)."""
+        return get_text(component)
 
-    def info(self, name: str) -> dict:
-        """Возвращает информацию о компоненте."""
-        component_dir = os.path.join(self._source, name)
-        if not os.path.isdir(component_dir):
-            raise ValueError(f"Компонент '{name}' не найден в {self._source}")
+    def link_tag(self, component: str) -> str:
+        """Возвращает готовый HTML-тег для подключения компонента.
 
-        files = [f for f in os.listdir(component_dir) if not f.startswith(".")]
+        Example:
+            client.link_tag("logo")
+            # '<img src="https://api.my1409.ru/design?component=logo" alt="logo">'
 
-        meta_path = os.path.join(component_dir, "meta.json")
-        description = ""
-        if os.path.isfile(meta_path):
-            with open(meta_path, encoding="utf-8") as f:
-                meta = json.load(f)
-            description = meta.get("description", "")
+            client.link_tag("button")
+            # '<link rel="stylesheet" href="https://api.my1409.ru/design?component=button">'
+        """
+        return link_tag(component)
 
-        return {
-            "name": name,
-            "files": sorted(files),
-            "description": description,
-        }
-
-    def pull(self, name: str, dest: str, format: str = "html") -> str:
-        """Копирует файлы компонента в указанную папку."""
-        component_dir = os.path.join(self._source, name)
-        if not os.path.isdir(component_dir):
-            raise ValueError(f"Компонент '{name}' не найден в {self._source}")
-
+    def pull(self, component: str, dest: str) -> str:
+        """Скачивает компонент и сохраняет файл в указанную папку."""
+        data = get(component)
         os.makedirs(dest, exist_ok=True)
-
-        if format == "all":
-            target = os.path.join(dest, name)
-            if os.path.exists(target):
-                shutil.rmtree(target)
-            shutil.copytree(component_dir, target)
-            return target
-
-        if format not in ("html", "css"):
-            raise ValueError(f"Неподдерживаемый формат '{format}'. Используйте: html, css, all")
-
-        src_file = os.path.join(component_dir, f"{name}.{format}")
-        if not os.path.isfile(src_file):
-            raise FileNotFoundError(
-                f"Файл '{name}.{format}' не найден в компоненте '{name}'"
-            )
-
-        dest_file = os.path.join(dest, f"{name}.{format}")
-        shutil.copy2(src_file, dest_file)
+        dest_file = os.path.join(dest, component)
+        with open(dest_file, "wb") as f:
+            f.write(data)
         return dest_file
 
-    def pull_all(self, dest: str, format: str = "html") -> list[str]:
-        """Копирует все компоненты дизайн-системы в указанную папку."""
-        results = []
-        for name in self.list():
-            try:
-                path = self.pull(name, dest=dest, format=format)
-                results.append(path)
-            except FileNotFoundError:
-                pass
-        return results
+    def list(self) -> list[str]:
+        """Возвращает список доступных компонентов с сервера."""
+        return get_list()
 
     def fonts(self, dest: str) -> list[str]:
         """Копирует шрифты дизайн-системы в указанную папку."""
