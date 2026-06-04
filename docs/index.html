@@ -49,21 +49,13 @@
       z-index: 0;
     }
 
-    .blob {
+    /* SVG растянут на весь hero */
+    .hero-bg svg {
+      width: 100%;
+      height: 100%;
       position: absolute;
-      border-radius: 50%;
-      filter: blur(120px);
-      opacity: 0.55;
-    }
-    .blob-blue {
-      width: 700px; height: 700px;
-      background: var(--blue);
-      top: -200px; left: -200px;
-    }
-    .blob-red {
-      width: 500px; height: 500px;
-      background: var(--red);
-      bottom: -150px; right: -100px;
+      inset: 0;
+      preserveAspectRatio: xMidYMid slice;
     }
 
     .hero-content {
@@ -75,7 +67,7 @@
     .hero-logo {
       height: 64px;
       margin-bottom: 36px;
-      filter: drop-shadow(0 0 24px rgba(68,70,225,0.6));
+      filter: drop-shadow(0 0 32px rgba(68,70,225,0.5));
     }
 
     .hero h1 {
@@ -85,13 +77,14 @@
       letter-spacing: -1px;
       line-height: 1.1;
       margin-bottom: 20px;
+      color: #111;
     }
 
     .hero h1 span { color: var(--blue); }
 
     .hero p {
       font-size: 1.15rem;
-      color: rgba(255,255,255,0.7);
+      color: rgba(0,0,0,0.65);
       line-height: 1.7;
       margin-bottom: 40px;
     }
@@ -118,14 +111,14 @@
     .btn-primary:hover { box-shadow: 0 8px 32px rgba(68,70,225,0.6); }
 
     .btn-outline {
-      border: 1px solid var(--border);
-      color: rgba(255,255,255,0.8);
-      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(0,0,0,0.15);
+      color: rgba(0,0,0,0.7);
+      background: rgba(255,255,255,0.45);
       backdrop-filter: blur(8px);
     }
-    .btn-outline:hover { border-color: rgba(255,255,255,0.25); }
+    .btn-outline:hover { background: rgba(255,255,255,0.65); }
 
-    /* ── SECTIONS ── */
+    /* ── SECTIONS (тёмные) ── */
     section { max-width: 900px; margin: 0 auto; padding: 80px 24px; }
 
     .section-label {
@@ -146,7 +139,7 @@
       letter-spacing: -0.5px;
     }
 
-    /* ── INSTALL ── */
+    /* ── CODE BLOCKS ── */
     .code-block {
       background: var(--dark2);
       border: 1px solid var(--border);
@@ -168,9 +161,9 @@
 
     .code-dots { display: flex; gap: 6px; }
     .dot { width: 10px; height: 10px; border-radius: 50%; }
-    .dot-red   { background: #E63530; }
-    .dot-yellow{ background: #F5A623; }
-    .dot-green { background: #27C93F; }
+    .dot-red    { background: #E63530; }
+    .dot-yellow { background: #F5A623; }
+    .dot-green  { background: #27C93F; }
 
     pre {
       padding: 20px 22px;
@@ -185,9 +178,7 @@
     .fn  { color: #5CB8FF; }
     .str { color: #68D49E; }
     .cm  { color: #555570; font-style: italic; }
-    .tag { color: #E68A5C; }
     .at  { color: #9B8AFF; }
-    .val { color: #68D49E; }
 
     /* ── API TABLE ── */
     .api-grid {
@@ -224,16 +215,6 @@
       line-height: 1.5;
     }
     .api-cell:last-child { border-right: none; }
-
-    .method-tag {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.8rem;
-      background: rgba(68,70,225,0.15);
-      color: #9B8AFF;
-      padding: 2px 8px;
-      border-radius: 5px;
-    }
-
     .api-row .api-cell:first-child {
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.82rem;
@@ -275,14 +256,12 @@
       font-size: 1rem;
       margin-bottom: 8px;
     }
-
     .feature-card p {
       font-size: 0.875rem;
       color: var(--gray);
       line-height: 1.6;
     }
 
-    /* ── DIVIDER ── */
     .divider {
       border: none;
       border-top: 1px solid var(--border);
@@ -290,7 +269,6 @@
       margin: 0 auto;
     }
 
-    /* ── FOOTER ── */
     footer {
       text-align: center;
       padding: 40px 24px;
@@ -303,12 +281,38 @@
 </head>
 <body>
 
-  <!-- HERO -->
+  <!-- HERO — фон из apps-wallpaper.svg -->
   <div class="hero">
     <div class="hero-bg">
-      <div class="blob blob-blue"></div>
-      <div class="blob blob-red"></div>
+      <svg viewBox="0 0 440 395" preserveAspectRatio="xMidYMid slice"
+           xmlns="http://www.w3.org/2000/svg"
+           style="position:absolute;inset:0;width:100%;height:100%;">
+        <rect width="440" height="395" fill="white"/>
+        <g filter="url(#f0)">
+          <ellipse cx="351.596" cy="205.808" rx="351.596" ry="205.808"
+            transform="matrix(0.922438 -0.386146 0.337507 0.941323 -242 -194.463)"
+            fill="#4446E1"/>
+        </g>
+        <g filter="url(#f1)">
+          <ellipse cx="367.5" cy="-37.5" rx="236.5" ry="145.5" fill="#E63530"/>
+        </g>
+        <defs>
+          <filter id="f0" x="-329.962" y="-523.088" width="963.499" height="773.178"
+            filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+            <feGaussianBlur stdDeviation="75" result="effect1_foregroundBlur"/>
+          </filter>
+          <filter id="f1" x="-19" y="-333" width="773" height="591"
+            filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+            <feGaussianBlur stdDeviation="75" result="effect1_foregroundBlur"/>
+          </filter>
+        </defs>
+      </svg>
     </div>
+
     <div class="hero-content">
       <img src="logo.png" alt="1409" class="hero-logo">
       <h1>Python SDK для<br><span>дизайн-системы 1409</span></h1>
@@ -328,7 +332,7 @@
       <div class="feature-card">
         <div class="feature-icon icon-blue">🔗</div>
         <h3>HTML-теги одной строкой</h3>
-        <p>Получи готовый <code>&lt;link&gt;</code> или <code>&lt;img&gt;</code> тег для любого компонента без лишнего кода.</p>
+        <p>Готовый <code>&lt;link&gt;</code> или <code>&lt;img&gt;</code> тег для любого компонента без лишнего кода.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon icon-blue">⚡</div>
@@ -358,9 +362,7 @@
     <div class="code-block">
       <div class="code-header">
         <div class="code-dots">
-          <div class="dot dot-red"></div>
-          <div class="dot dot-yellow"></div>
-          <div class="dot dot-green"></div>
+          <div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div>
         </div>
         <span>terminal</span>
       </div>
@@ -370,9 +372,7 @@
     <div class="code-block">
       <div class="code-header">
         <div class="code-dots">
-          <div class="dot dot-red"></div>
-          <div class="dot dot-yellow"></div>
-          <div class="dot dot-green"></div>
+          <div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div>
         </div>
         <span>quickstart.py</span>
       </div>
@@ -387,7 +387,7 @@ client = <span class="fn">Client</span>()
 <span class="fn">print</span>(client.<span class="fn">link_tag</span>(<span class="str">"button"</span>))
 <span class="cm"># &lt;link rel="stylesheet" href="https://api.my1409.ru/design?component=button"&gt;</span>
 
-<span class="cm"># Вставить в шаблон</span>
+<span class="cm"># Вставить в HTML-шаблон</span>
 logo = client.<span class="fn">link_tag</span>(<span class="str">"logo"</span>)
 html = <span class="str">f"&lt;html&gt;&lt;body&gt;</span>{logo}<span class="str">&lt;/body&gt;&lt;/html&gt;"</span>
 
@@ -413,7 +413,7 @@ client.<span class="fn">fonts</span>(dest=<span class="str">"./assets/fonts/"</s
       </div>
       <div class="api-row">
         <div class="api-cell">link_tag(component)</div>
-        <div class="api-cell">Возвращает готовый HTML-тег (<code>&lt;img&gt;</code>, <code>&lt;link&gt;</code>) для вставки компонента на страницу</div>
+        <div class="api-cell">Готовый HTML-тег (<code>&lt;img&gt;</code>, <code>&lt;link&gt;</code>) для вставки компонента на страницу</div>
       </div>
       <div class="api-row">
         <div class="api-cell">get(component)</div>
@@ -448,9 +448,7 @@ client.<span class="fn">fonts</span>(dest=<span class="str">"./assets/fonts/"</s
     <div class="code-block">
       <div class="code-header">
         <div class="code-dots">
-          <div class="dot dot-red"></div>
-          <div class="dot dot-yellow"></div>
-          <div class="dot dot-green"></div>
+          <div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div>
         </div>
         <span>app.py</span>
       </div>
@@ -465,18 +463,20 @@ client = <span class="fn">Client</span>()
     logo = client.<span class="fn">link_tag</span>(<span class="str">"logo"</span>)
     bg   = client.<span class="fn">link_tag</span>(<span class="str">"background"</span>)
     <span class="kw">return</span> render_template_string(<span class="str">f"""
-        &lt;html&gt;
-          &lt;body&gt;
-            {bg}
-            {logo}
-          &lt;/body&gt;
-        &lt;/html&gt;
+        &lt;html&gt;&lt;body&gt;
+          {bg}
+          {logo}
+        &lt;/body&gt;&lt;/html&gt;
     """</span>)</pre>
     </div>
   </section>
 
   <footer>
-    <p>1409 SDK — MIT License &nbsp;·&nbsp; <a href="https://github.com/loginov-al/1409-sdk-py" target="_blank">GitHub</a> &nbsp;·&nbsp; <a href="Doc.md">Документация</a></p>
+    <p>1409 SDK — MIT License &nbsp;·&nbsp;
+      <a href="https://github.com/loginov-al/1409-sdk-py" target="_blank">GitHub</a>
+      &nbsp;·&nbsp;
+      <a href="Doc.md">Документация</a>
+    </p>
   </footer>
 
 </body>
