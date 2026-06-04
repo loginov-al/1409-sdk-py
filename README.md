@@ -12,7 +12,7 @@ pip install 1409sdk
 ## Быстрый старт
 
 ```python
-from 1409sdk.client import Client
+from sdk1409.client import Client
 
 client = Client()
 

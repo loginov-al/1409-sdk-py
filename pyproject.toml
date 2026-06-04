@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "1409sdk"
+version = "0.1.0"
+description = "Python SDK для дизайн-системы 1409"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+keywords = ["1409", "design", "sdk", "ui"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["sdk1409*"]
