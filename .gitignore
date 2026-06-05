@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+.venv/
+venv/
+env/
+
+# Env files — NEVER commit
+.env
+.env.local
+.env.production
+
+# Storage (user uploads — keep locally)
+admin/storage/
+
+# OS
+.DS_Store
+Thumbs.db
